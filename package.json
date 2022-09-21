@@ -1,0 +1,29 @@
+{
+  "name": "json-interpolate",
+  "version": "1.0.0",
+  "description": "Interpolate json. Inject variables to JSON. Allows to profide inteface and description for variables",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VladimirZaets/json-interpolate.git"
+  },
+  "keywords": [
+    "json",
+    "interpolate",
+    "json-interpolate",
+    "interpolate-json",
+    "json-variables"
+  ],
+  "author": "Volodymyr Zaiets",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VladimirZaets/json-interpolate/issues"
+  },
+  "homepage": "https://github.com/VladimirZaets/json-interpolate#readme",
+  "dependencies": {
+    "validator": "^13.7.0"
+  }
+}
