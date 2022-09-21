@@ -54,7 +54,7 @@ class InterpolateJson {
                 variables[variableInJson.name]
             );
         }
-        console.log(resultString)
+        return resultString;
     }
 
     getMissedVariables(passedVariables, variablesInJson) {
