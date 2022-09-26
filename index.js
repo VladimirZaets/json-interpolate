@@ -60,7 +60,7 @@ class InterpolateJson {
         }
 
         if (validationResult.variables.length) {
-            result.error = errors.JSONInterpolateAggregateError(
+            result.error = new errors.JSONInterpolateAggregateError(
                 `The next variables has invalid type.`,
                 {
                     list: validationResult.variables.map(variable => new errors.VariableTypeError(
