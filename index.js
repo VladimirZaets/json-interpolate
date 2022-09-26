@@ -30,7 +30,7 @@ class InterpolateJson {
                             variable: variable.name,
                             requestedType: this.variablesInterface[variable.name]
                         }
-                    ));
+                    ))
                 );
                 return result;
             }
