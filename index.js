@@ -1,60 +1,90 @@
 const validator = require('./lib/validator');
+const errors = require('./lib/errors')
 
 class InterpolateJson {
     constructor(config) {
         this.variablesInterface = config.variablesInterface;
-        this.interpolationTemplate = new RegExp(config.interpolationTemplate, 'g') || /\$\{(.*?)\}/g;
+        this.interpolationTemplate = config.interpolationTemplate ? new RegExp(config.interpolationTemplate, 'g') : /\$\{(.*?)\}/g;
     }
 
     interpolate(jsonString, variables, required = true) {
         const variablesInJson = this.getJsonVariables(jsonString);
+        const result = {
+            error: null,
+            data: null
+        };
 
         if (!variables) {
-            return new Error(`Variables parameter is required.`);
+            result.error = new Error(`Variables parameter is required.`);
+            return result;
         }
 
         if (required) {
             const missedVariables = this.getMissedVariables(variables, variablesInJson);
             if (missedVariables.length) {
-                return new Error(
-                    `JSON contain variables that are not passed.
-                    Variables: ${missedVariables.map(variable => variable.name).join(', ')}`
+                result.error = new errors.JSONInterpolateAggregateError(
+                    `JSON contain variables that are not passed.`,
+                    missedVariables.map(variable => new errors.MissedVariableError(
+                        `Variable ${variable.name}`,
+                        {
+                            variable: variable.name,
+                            requestedType: this.variablesInterface[variable.name]
+                        }
+                    ));
                 );
+                return result;
             }
         };
 
         if (this.variablesInterface) {
             const variablesWithoutInterface = this.getVariablesWithoutDeclaredInterface(variablesInJson)
             if (variablesWithoutInterface.length) {
-                return new Error(
-                    `JSON contain variables for which interface is not declared.
-                    Variables: ${variablesWithoutInterface.map(variable => variable.name).join(', ')}`
+                result.error = new errors.JSONInterpolateAggregateError(
+                    `JSON contain variables for which interface is not declared.`,
+                    variablesWithoutInterface.map(variable => new errors.VariableDeclarationError(
+                        `Variable: ${variable.name}`,
+                        {
+                            variable: variable.name,
+                            requestedType: null
+                        }
+                    ))           
                 );
+                return result;
             }
         }
 
         const validationResult = this.getInvalidVariables(variables);
         if (validationResult.errors.length) {
-            return validationResult.errors;
+            result.error = validationResult.errors;
+            return result;
         }
 
         if (validationResult.variables.length) {
-            return new Error(
-                `The next variables has invalid type. 
-                Variables: ${validationResult.variables.join(', ')}
-                Please verify the type and try again.`
+            result.error = errors.JSONInterpolateAggregateError(
+                `The next variables has invalid type.`,
+                {
+                    list: validationResult.variables.map(variable => new VariableTypeError(
+                        `Variable: ${variable}. /n
+                        Requested type: ${this.variablesInterface[variable].type}`,
+                        {
+                            requestedType: this.variablesInterface[variable].type,
+                            variable
+                        }
+                    ))
+                }
             );
+            return result;
         }
 
         let resultString = jsonString
-        for (const variableInJson of variablesInJson) {
-            
+        for (const variableInJson of variablesInJson) {        
             resultString = resultString.replace(
                 variableInJson.full,
                 variables[variableInJson.name]
             );
         }
-        return resultString;
+        result.data = resultString
+        return result;
     }
 
     getMissedVariables(passedVariables, variablesInJson) {
