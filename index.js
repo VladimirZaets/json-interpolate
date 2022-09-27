@@ -62,16 +62,13 @@ class InterpolateJson {
         if (validationResult.variables.length) {
             result.error = new errors.JSONInterpolateAggregateError(
                 `The next variables has invalid type.`,
-                {
-                    list: validationResult.variables.map(variable => new errors.VariableTypeError(
-                        `Variable: ${variable}. /n
-                        Requested type: ${this.variablesInterface[variable].type}`,
-                        {
-                            requestedType: this.variablesInterface[variable].type,
-                            variable
-                        }
-                    ))
-                }
+                 validationResult.variables.map(variable => new errors.VariableTypeError(
+                    `Variable: ${variable}\nRequested type: ${this.variablesInterface[variable].type}`,
+                    {
+                        requestedType: this.variablesInterface[variable].type,
+                        variable
+                    }
+                ))
             );
             return result;
         }
