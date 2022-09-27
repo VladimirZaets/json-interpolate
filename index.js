@@ -3,7 +3,7 @@ const errors = require('./lib/errors')
 
 class InterpolateJson {
     constructor(config) {
-        this.variablesInterface = config.variablesInterface;
+        this.variablesInterface = config.variablesSchema;
         this.interpolationTemplate = config.interpolationTemplate ? new RegExp(config.interpolationTemplate, 'g') : /\$\{(.*?)\}/g;
     }
 
